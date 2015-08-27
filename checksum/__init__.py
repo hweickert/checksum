@@ -40,15 +40,11 @@ def get_for_directory(
     ):
     hash_func = _HASH_MODE_DICT.get(hash_mode)
 
-    hashvalues = []
-
     root_dps_fns =      os.walk( dp, topdown=True )
     root_dps_fns =      itertools.imap(         list,                  root_dps_fns )
-
     if filter_dots:
         root_dps_fns =  itertools.ifilterfalse( _is_dot_root,           root_dps_fns )
         root_dps_fns =  itertools.imap(         _filter_dot_fns,        root_dps_fns )
-
     fps_lists =         itertools.imap(         _gen_fps,               root_dps_fns )
     fps =               itertools.chain(        *fps_lists )
     fps =               itertools.ifilterfalse( filter_func,           fps )
