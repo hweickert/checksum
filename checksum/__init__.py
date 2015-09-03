@@ -62,13 +62,11 @@ def get_for_directory(
 def get_for_file( fp, hash_mode="md5" ):
     hash_func = _HASH_MODE_DICT.get(hash_mode)
 
-    result_hash = hash_func()
     with _get_file_handle(fp) as f:
         file_hash_digest = _get_file_hash_digest( f, hash_func )
         file_hash_digest = _get_utf8_encoded( file_hash_digest )
-        result_hash.update( file_hash_digest )
 
-        return result_hash.hexdigest()
+        return file_hash_digest
 
 
 
