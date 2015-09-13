@@ -38,6 +38,19 @@ def get_for_directory(
         filter_dots=False,
         filter_func=lambda fp:False
     ):
+    r"""
+        Returns a hash string for the files below a given directory path.
+
+        :param dp:          Path to a directory.
+        :param hash_mode:   Can be either one of 'md5', 'sha1', 'sha256' or 'sha512'.
+                            Defines the algorithm used to generate the resulting hash
+                            string. Default is 'md5'.
+        :param filter_dots: If True will filter directories or files beginning with a '.' (dot) like '.git'.
+                            Default is False.
+        :param filter_func: A function receiving a path as a single paramter. If it returns True the given
+                            path will be excluded from the hash calculation. Otherwise it will be included.
+    """
+
     hash_func = _HASH_MODE_DICT.get(hash_mode)
 
     root_dps_fns =      os.walk( dp, topdown=True )
@@ -60,6 +73,15 @@ def get_for_directory(
 
 
 def get_for_file( fp, hash_mode="md5" ):
+    r"""
+        Returns a hash string for the given file path.
+
+        :param fp:          Path to the file.
+        :param hash_mode:   Can be either one of 'md5', 'sha1', 'sha256' or 'sha512'.
+                            Defines the algorithm used to generate the resulting hash
+                            string. Default is 'md5'.
+    """
+
     hash_func = _HASH_MODE_DICT.get(hash_mode)
 
     with _get_file_handle(fp) as f:
