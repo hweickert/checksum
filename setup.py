@@ -5,7 +5,7 @@ import setuptools
 setuptools.setup(
     name = "checksum",
     packages = ["checksum"],
-    version="1.0.2",
+    version="1.0.3",
     description="Creates checksums for files and directories.",
     author = 'Henry Weickert',
     author_email = 'henryweickert@gmail.com',
