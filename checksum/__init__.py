@@ -21,7 +21,17 @@ import hashlib
 import re
 import itertools
 
+try:
+    from itertools import imap
+except ImportError:
+    # Python 3...
+    imap=map
 
+try:
+    from itertools import ifilterfalse
+except ImportError:
+    # Python 3...
+    ifilterfalse=itertools.filterfalse
 
 _HASH_MODE_DICT = {
     "md5": hashlib.md5,
@@ -29,8 +39,6 @@ _HASH_MODE_DICT = {
     "sha256": hashlib.sha256,
     "sha512": hashlib.sha512
 }
-
-
 
 def get_for_directory(
         dp,
@@ -54,15 +62,15 @@ def get_for_directory(
     hash_func = _HASH_MODE_DICT.get(hash_mode)
 
     root_dps_fns =      os.walk( dp, topdown=True )
-    root_dps_fns =      itertools.imap(         list,                  root_dps_fns )
+    root_dps_fns =      imap(         list,                  root_dps_fns )
     if filter_dots:
-        root_dps_fns =  itertools.ifilterfalse( _is_dot_root,           root_dps_fns )
-        root_dps_fns =  itertools.imap(         _filter_dot_fns,        root_dps_fns )
-    fps_lists =         itertools.imap(         _gen_fps,               root_dps_fns )
+        root_dps_fns =  ifilterfalse( _is_dot_root,           root_dps_fns )
+        root_dps_fns =  imap(         _filter_dot_fns,        root_dps_fns )
+    fps_lists =         imap(         _gen_fps,               root_dps_fns )
     fps =               itertools.chain(        *fps_lists )
-    fps =               itertools.ifilterfalse( filter_func,           fps )
-    file_handles =      itertools.imap(         _get_file_handle,      fps )
-    file_hash_digests = itertools.imap(         _get_file_hash_digest, file_handles, itertools.repeat(hash_func) )
+    fps =               ifilterfalse( filter_func,           fps )
+    file_handles =      imap(         _get_file_handle,      fps )
+    file_hash_digests = imap(         _get_file_hash_digest, file_handles, itertools.repeat(hash_func) )
     file_hash_digests = sorted( file_hash_digests )
     file_hash_digests = map(    _get_utf8_encoded, file_hash_digests )
 
@@ -123,7 +131,7 @@ def _is_dot_root( root_dps_fns ):
 
 
 def _filter_dot_fns( root_dps_fns ):
-    root_dps_fns[2] = itertools.ifilterfalse( lambda fn: fn.startswith('.'), root_dps_fns[2] )
+    root_dps_fns[2] = ifilterfalse( lambda fn: fn.startswith('.'), root_dps_fns[2] )
     return root_dps_fns
 
 
