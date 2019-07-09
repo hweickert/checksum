@@ -25,13 +25,13 @@ import six
 try:
     from itertools import imap
 except ImportError:
-    # Python 3...
+    # Py3
     imap=map
 
 try:
     from itertools import ifilterfalse
 except ImportError:
-    # Python 3...
+    # Py3
     ifilterfalse=itertools.filterfalse
 
 _HASH_MODE_DICT = {
@@ -73,7 +73,7 @@ def get_for_directory(
     file_handles =      imap(         _get_file_handle,      fps )
     file_hash_digests = imap(         _get_file_hash_digest, file_handles, itertools.repeat(hash_func) )
     file_hash_digests = sorted( file_hash_digests )
-    file_hash_digests = list(imap(    _get_utf8_encoded, file_hash_digests ))
+    file_hash_digests = map(    _get_utf8_encoded, file_hash_digests )
 
     hash_ = _get_merged_hash( file_hash_digests, hash_func )
 
@@ -144,28 +144,22 @@ def _gen_fps( root_dps_fns ):
 
 def _get_utf8_encoded( hash_digest ):
     if six.PY2:
-        #print("Py2")
-        #print(hash_digest) # py2 print
-        return hash_digest.encode( "utf-8" ) # py2
+        return hash_digest.encode( 'utf-8' )
     if six.PY3:
-        #print("Py3")
-        hash_var = hash_digest.encode( "utf-8" )
-        #print(str(hash_var, 'utf-8')) # py3 print
-        return str(hash_var, 'utf-8') #py3
+        hash_encoded = hash_digest.encode( 'utf-8' )
+        return str(hash_encoded, 'utf-8')
 
 
 
 def _get_merged_hash(hash_digests, hashfunc):
+    result = hashfunc()
     if six.PY2:
-        result = hashfunc()
-        #print("py2 before map " + result.hexdigest())
         map( result.update, hash_digests )
-        #print(result.hexdigest()) # py2
     if six.PY3:
-        result = hashfunc()
-        #print("py3 before map " + str(result.hexdigest()))
-        map( result.update, hash_digests ) # I think issue is here is not updating
-        #print("merged " + str(result.hexdigest())) # py3
+        # map does not update result, even when provided an iterable object
+        #map( result.update, hash_digests )
+        for digest in hash_digests:
+            result.update(digest.encode('utf-8'))
     return result
 
 
