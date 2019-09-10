@@ -16,22 +16,22 @@
         >>> checksum.get_for_directory( "/some_directory" )
 """
 
+import sys
 import os
 import hashlib
 import re
 import itertools
-import six
 
-try:
+_PY2 = sys.version_info.major == 2
+
+if _PY2:
     from itertools import imap
-except ImportError:
-    # Py3
+else:
     imap=map
 
-try:
+if _PY2:
     from itertools import ifilterfalse
-except ImportError:
-    # Py3
+else:
     ifilterfalse=itertools.filterfalse
 
 _HASH_MODE_DICT = {
@@ -143,9 +143,9 @@ def _gen_fps( root_dps_fns ):
 
 
 def _get_utf8_encoded( hash_digest ):
-    if six.PY2:
+    if _PY2:
         return hash_digest.encode( 'utf-8' )
-    if six.PY3:
+    else:
         hash_encoded = hash_digest.encode( 'utf-8' )
         return str(hash_encoded, 'utf-8')
 
@@ -153,13 +153,8 @@ def _get_utf8_encoded( hash_digest ):
 
 def _get_merged_hash(hash_digests, hashfunc):
     result = hashfunc()
-    if six.PY2:
-        map( result.update, hash_digests )
-    if six.PY3:
-        # map does not update result, even when provided an iterable object
-        #map( result.update, hash_digests )
-        for digest in hash_digests:
-            result.update(digest.encode('utf-8'))
+    for digest in hash_digests:
+        result.update(digest.encode('utf-8'))
     return result
 
 
